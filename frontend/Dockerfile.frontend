@@ -1,0 +1,17 @@
+#Usando o nginx (um servidor http) com alpine
+FROM nginx:alpine
+
+#removendo o conteudo original do exemplo http
+RUN rm -rf /usr/share/nginx/html/*
+
+#copiando o arquivo index.html para dentro do container
+COPY index.html /usr/share/nginx/html/index.html
+
+#configuração do acesso a API
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+#expondo porta 80
+EXPOSE 80
+
+#Inicia o serviço
+CMD ["nginx", "-g", "daemon off;"]
