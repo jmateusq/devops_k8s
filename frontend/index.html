@@ -1,28 +1,49 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Crypto</title>
-  </head>
-  <body>
-    <h1>Aplicativo de salvamento de notas criptografadas</h1>
-    <textarea id="note" rows="5" cols="40"></textarea><br />
-    <button onclick="sendNote()">Enviar</button>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Crypto</title>
+</head>
+<body>
+  <h1>Aplicativo de salvamento de notas codificadas</h1>
+  <div>
+    <label for="encryption-method">Método de Codificação:</label>
+    <select id="encryption-method">
+      <option value="base64">Base64</option>
+      <option value="rot13">ROT13 Cipher</option>
+      <option value="reverse">Inverter String</option>
+      <option value="urlencode">URL Encode</option>
+    </select>
+  </div>
+  <div>
+    <textarea id="note" rows="5" cols="40" placeholder="Digite sua nota aqui..."></textarea><br />
+  </div>
+  <button onclick="sendNote()">Enviar Nota</button>
+  <p><a href="/notes.html">Ver todas as notas salvas</a></p>
 
-    <script>
-      async function sendNote() {
-        const note = document.getElementById("note").value;
-        const response = await fetch("/api/note", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ note }),
-        });
+  <script>
+    async function sendNote() {
+      const note = document.getElementById("note").value;
+      const method = document.getElementById("encryption-method").value;
 
-        if (response.ok) {
-          alert("Nota salva");
-        } else {
-          alert("Erro ao salvar nota");
-        }
+      if (!note) {
+        alert("Por favor, digite uma nota.");
+        return;
       }
-    </script>
-  </body>
+
+      const response = await fetch("/api/note", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note, method }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        alert("Nota salva com sucesso!");
+        document.getElementById("note").value = "";
+      } else {
+        alert(`Erro ao salvar: ${result.error}`);
+      }
+    }
+  </script>
+</body>
 </html>

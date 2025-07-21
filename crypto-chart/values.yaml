@@ -1,0 +1,38 @@
+# crypto-chart/values.yaml
+
+# Configurações globais
+replicaCount: 1
+
+# Configurações do serviço da API (backend)
+api:
+  image:
+    repository: note-api
+    tag: latest
+    pullPolicy: IfNotPresent # Importante para usar imagens locais
+  service:
+    name: api-service
+    type: ClusterIP
+    port: 3000
+
+# Configurações do serviço do Frontend
+frontend:
+  image:
+    repository: note-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    name: frontend-service
+    type: ClusterIP
+    port: 80
+
+# Configurações do MongoDB
+mongodb:
+  image:
+    repository: mongo
+    tag: "6.0" # Use aspas para versões numéricas
+  service:
+    name: mongodb-service
+    port: 27017
+  persistence:
+    enabled: true
+    size: 1Gi # Tamanho do "HD virtual"

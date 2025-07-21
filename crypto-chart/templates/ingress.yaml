@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+spec:
+  rules:
+  - host: "k8s.local"
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            # O nome do seu serviço da API
+            name: api-service
+            port:
+              # A porta do serviço da API
+              number: 3000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            # O nome do seu serviço do frontend
+            name: frontend-service
+            port:
+              # A porta do serviço do frontend
+              number: 80

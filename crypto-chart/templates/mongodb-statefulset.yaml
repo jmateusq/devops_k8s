@@ -1,0 +1,33 @@
+# crypto-chart/templates/mongodb-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: {{ .Values.mongodb.service.name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: "{{ .Values.mongodb.image.repository }}:{{ .Values.mongodb.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.mongodb.service.port }}
+          volumeMounts:
+            - name: mongo-persistent-storage # Nome da montagem
+              mountPath: /data/db # Onde montar dentro do container
+  # Esta seção cria o pedido de armazenamento persistente (o nosso "volume")
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-persistent-storage # Nome do "HD"
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.mongodb.persistence.size }}

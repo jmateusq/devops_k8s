@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Crypto - Notas Salvas</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    #controls { background-color: #f0f0f0; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
+    select, button { padding: 8px 12px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
+    button { cursor: pointer; background-color: #007bff; color: white; }
+    #notes-list { list-style-type: none; padding: 0; }
+    #notes-list li { background-color: #fff; border: 1px solid #ddd; margin-top: -1px; padding: 12px; word-wrap: break-word; }
+    a { display: block; margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Notas Salvas (Codificadas)</h1>
+  <div id="controls">
+    <label for="decryption-method">Escolha o método para decodificar:</label>
+    <select id="decryption-method">
+      <option value="base64">Base64</option>
+      <option value="rot13">ROT13 Cipher</option>
+      <option value="reverse">Inverter String</option>
+      <option value="urlencode">URL Decode</option>
+    </select>
+    <button id="decrypt-button" onclick="decryptNotes()">Aplicar Método</button>
+  </div>
+  <ul id="notes-list"><li>Carregando...</li></ul>
+  <a href="/">Voltar para a página principal</a>
+
+  <script>
+    function rot13(str) {
+      return str.replace(/[a-zA-Z]/g, function (c) {
+        return String.fromCharCode(
+          (c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26
+        );
+      });
+    }
+
+    async function fetchAndDisplayNotes() {
+      const listElement = document.getElementById("notes-list");
+      try {
+        const response = await fetch("/api/notes");
+        if (!response.ok) throw new Error("Falha ao buscar notas do servidor.");
+        const notes = await response.json();
+        listElement.innerHTML = "";
+        if (notes.length === 0) {
+          listElement.innerHTML = "<li>Nenhuma nota encontrada.</li>";
+          return;
+        }
+        notes.forEach(item => {
+          const listItem = document.createElement("li");
+          listItem.dataset.encryptedNote = item.note;
+          listItem.textContent = item.note;
+          listElement.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error("Erro:", error);
+        listElement.innerHTML = `<li>Erro ao carregar as notas: ${error.message}</li>`;
+      }
+    }
+
+    function decryptNotes() {
+      const method = document.getElementById("decryption-method").value;
+      const notesListItems = document.querySelectorAll("#notes-list li");
+      notesListItems.forEach(li => {
+        if (li.dataset.encryptedNote) {
+          const encryptedNote = li.dataset.encryptedNote;
+          let decryptedNote;
+          try {
+            switch (method) {
+              case 'base64': decryptedNote = atob(encryptedNote); break;
+              case 'rot13': decryptedNote = rot13(encryptedNote); break;
+              case 'reverse': decryptedNote = encryptedNote.split('').reverse().join(''); break;
+              case 'urlencode': decryptedNote = decodeURIComponent(encryptedNote); break;
+              default: decryptedNote = "ERRO: MÉTODO SELECIONADO INVÁLIDO";
+            }
+          } catch (e) {
+            decryptedNote = `Falha ao aplicar ${method}. (Entrada inválida)`;
+            console.error(e);
+          }
+          li.textContent = decryptedNote;
+        }
+      });
+    }
+
+    window.onload = fetchAndDisplayNotes;
+  </script>
+</body>
+</html>

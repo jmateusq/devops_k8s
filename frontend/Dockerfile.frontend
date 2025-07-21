@@ -4,8 +4,10 @@ FROM nginx:alpine
 #removendo o conteudo original do exemplo http
 RUN rm -rf /usr/share/nginx/html/*
 
-#copiando o arquivo index.html para dentro do container
+
+#copiando os arquivos *.html para dentro do container
 COPY index.html /usr/share/nginx/html/index.html
+COPY notes.html /usr/share/nginx/html/notes.html
 
 #configuração do acesso a API
 COPY nginx.conf /etc/nginx/conf.d/default.conf
