@@ -149,5 +149,3 @@ Após salvar o arquivo de hosts, a configuração está completa. Abra seu naveg
 ## Autor
 
 José Mateus Freitas Queiroz - 811840
-
-```
